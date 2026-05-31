@@ -236,16 +236,11 @@ function hsl(h,s,l){ return `hsl(${h} ${s}% ${l}%)`; }
 function randomizeColors(){
   const h = Math.floor(Math.random()*360);
   const comp = (h + 180) % 360;
-  // vivid: high saturation; alternate which one is dark/light for contrast
-  const flip = Math.random() < 0.5;
   const sat = 85 + Math.floor(Math.random()*15);
-  if(flip){
-    bg = hsl(h, sat, 52);
-    fg = hsl(comp, sat, 12);
-  } else {
-    bg = hsl(h, sat, 14);
-    fg = hsl(comp, sat, 58);
-  }
+  // always: dark color on the BACKGROUND, light color on the TEXT.
+  // hues stay random/vivid, but the dark/light roles never swap.
+  bg = hsl(h,    sat, 14);
+  fg = hsl(comp, sat, 60);
   applyColors();
 }
 function applyColors(){
