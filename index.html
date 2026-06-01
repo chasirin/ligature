@@ -26,7 +26,7 @@
   #stage{
     width:100%;max-width:1100px;height:100%;
     display:flex;flex-direction:column;align-items:center;justify-content:center;
-    padding:40px 50px;gap:0;
+    padding:6px 10px;gap:0;
     text-align:center;
   }
 
@@ -80,13 +80,26 @@ const LINES = [
 
 const stage = document.getElementById('stage');
 
-/* responsive base size: fit the longest line to width */
+/* responsive base size: fill almost edge-to-edge.
+   constrained by BOTH width (longest line) and height (total lines),
+   so the type is as big as possible while leaving only a tiny margin —
+   a margin still a bit larger than the line gap / leading. */
 function computeFontSize(){
-  const w = Math.min(window.innerWidth, 1100) - 100; // padding
-  // longest line char count drives size; Avant Garde Bold caps run wide
+  const w = Math.min(window.innerWidth, 1100) - 20; // tiny side padding
+  const h = window.innerHeight - 12;                // tiny top/bottom padding
+
+  // width constraint: longest line of caps
   const longest = LINES.reduce((m,l)=>Math.max(m,l.length),0);
-  let fs = w / (longest*0.64);
-  fs = Math.max(20, Math.min(fs, 120));
+  const fsByWidth = w / (longest*0.60);
+
+  // height constraint: text lines at line-height 0.84 + gaps (0.28 each)
+  const textLines = LINES.filter(l=>l!=='').length;
+  const gaps = LINES.filter(l=>l==='').length;
+  const heightUnits = textLines*0.84 + gaps*0.28;
+  const fsByHeight = h / heightUnits;
+
+  let fs = Math.min(fsByWidth, fsByHeight);
+  fs = Math.max(20, Math.min(fs, 220));
   return fs;
 }
 
@@ -210,7 +223,7 @@ function render(){
   for(const t of LINES){
     if(t===''){
       const sp = document.createElement('div');
-      sp.style.height = (fs*0.42)+'px';
+      sp.style.height = (fs*0.28)+'px';
       stage.appendChild(sp);
     } else {
       stage.appendChild(buildLine(t));
